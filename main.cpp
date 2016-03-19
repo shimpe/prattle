@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("MaryTTS", new MaryTTS());
+    QScopedPointer<MaryTTS> M(new MaryTTS());
+    engine.rootContext()->setContextProperty("MaryTTS", M.data());
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
