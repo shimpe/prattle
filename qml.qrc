@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>TView.qml</file>
+        <file>CView.qml</file>
     </qresource>
 </RCC>

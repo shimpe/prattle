@@ -7,16 +7,30 @@ Item {
     property bool ready : false;
     property ListModel model : {}
 
+    signal configureClicked;
+
     GridLayout {
         id: grid
         rows: 5
         columns: 1
         anchors.fill: parent
-        ComboBox {
-            id: voiceSelector
-            enabled: it.ready
-            model: it.model
-            Layout.fillWidth: true
+
+        RowLayout {
+            ComboBox {
+                id: voiceSelector
+                enabled: it.ready
+                model: it.model
+                Layout.fillWidth: true
+            }
+            Button {
+                id: config
+                enabled: true
+                text: "Options >>>"
+                Layout.fillWidth: false
+                onClicked: {
+                    it.configureClicked();
+                }
+            }
         }
 
         TextArea {
@@ -33,7 +47,12 @@ Item {
                 var voicetxt_els = voicetxt.split(" ");
                 var voice = voicetxt_els[0];
                 var locale = voicetxt_els[1];
-                if (event.modifiers == Qt.ControlModifier)
+                if (event.modifiers == (Qt.ControlModifier|Qt.AltModifier))
+                {
+                    MaryTTS.synthesize(textInput.text, voice, locale, false);
+                    event.accepted = true
+                }
+                else if (event.modifiers == Qt.ControlModifier)
                 {
                     MaryTTS.synthesize(textInput.text, voice, locale, false);
                     textInput.text = ""
@@ -73,6 +92,21 @@ Item {
                     var locale = voicetxt_els[1];
                     MaryTTS.synthesize(textInput.text, voice, locale, false);
                     textInput.text = ""
+                }
+            }
+
+            Button {
+                id: sayNCButton
+                text: "Say (Ctrl+Alt+Enter)"
+                Layout.fillWidth: false
+                enabled: it.ready
+
+                onClicked: {
+                    var voicetxt = voiceSelector.currentText;
+                    var voicetxt_els = voicetxt.split(" ");
+                    var voice = voicetxt_els[0];
+                    var locale = voicetxt_els[1];
+                    MaryTTS.synthesize(textInput.text, voice, locale, false);
                 }
             }
 

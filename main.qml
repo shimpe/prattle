@@ -3,13 +3,15 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 
 ApplicationWindow {
+    id: appWindow
     visible: true
-    width: 640
-    height: 480
+    width: 800
+    height: 600
     title: qsTr("Prattle: simple MaryTTS frontend")
 
     property bool allReady : false
     property int checkInterval: 500
+    property string currentURL : "localhost:59125"
 
     ListModel {
         id: voices
@@ -18,7 +20,7 @@ ApplicationWindow {
     function getVoices()
     {
         var http = new XMLHttpRequest();
-        var url = "http://localhost:59125/voices";
+        var url = "http://" + appWindow.currentURL + "/voices";
         var params = "";
         http.open("POST", url, true);
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -49,7 +51,7 @@ ApplicationWindow {
     function updateStatus()
     {
         var http = new XMLHttpRequest();
-        var url = "http://localhost:59125/version";
+        var url = "http://" + appWindow.currentURL + "/version";
         var params = "";
         http.open("POST", url, true);
 
@@ -75,7 +77,7 @@ ApplicationWindow {
                 }
                 else
                 {
-                    versionLabel.text = "<b>Error connecting to MaryTTS server at http://localhost:59125. Will retry in 500ms.</b>"
+                    versionLabel.text = "<b>Error connecting to MaryTTS server at http://" + appWindow.currentURL +". Will retry in 500ms.</b>"
                     allReady = false
                 }
             }
@@ -86,10 +88,6 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("File")
-            MenuItem {
-                text: qsTr("&Open")
-                onTriggered: console.log("Open action triggered");
-            }
             MenuItem {
                 text: qsTr("Exit")
                 onTriggered: Qt.quit();
@@ -105,9 +103,19 @@ ApplicationWindow {
             id: tView
             ready : allReady
             model: voices
-            anchors.fill: parent
+            onConfigureClicked: sView.push(cfgView)
         }
 
+    }
+
+
+    Component {
+        id :cfgView
+        CView {
+            currentURL : appWindow.currentURL
+            onBackClicked: sView.pop()
+            onUrlChanged: appWindow.currentURL = URL;
+        }
     }
 
     StackView
